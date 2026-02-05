@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://h2ol6cyidpje"]
+
+[ext_resource type="Script" uid="uid://csx3sxfvkmnbr" path="res://script/scene/MainMenu.cs" id="1_0ykhv"]
+[ext_resource type="FontFile" uid="uid://bhllm44026v4e" path="res://assets/font/ark-pixel-12px-monospaced-zh_cn.ttf.woff2" id="2_0ykhv"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_0ykhv"]
+line_spacing = 0.0
+font = ExtResource("2_0ykhv")
+font_size = 26
+
+[node name="MainMenu" type="Control" unique_id=1873082843]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_0ykhv")
+
+[node name="VersionLabel" type="Label" parent="." unique_id=494664407]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.95400006
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -0.32006836
+offset_right = 524.0
+offset_bottom = -17.0
+grow_vertical = 2
+text = "VERSION LABEL"
+label_settings = SubResource("LabelSettings_0ykhv")
+vertical_alignment = 1
+
+[node name="LicenseLabel" type="Label" parent="." unique_id=641474151]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = 0.95400006
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -770.0
+offset_top = -0.32006836
+offset_right = -18.0
+offset_bottom = -17.0
+grow_vertical = 2
+text = "NON-COMMERCIAL USE. Licensed under CC0-1.0."
+label_settings = SubResource("LabelSettings_0ykhv")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=647856875]
+unique_name_in_owner = true

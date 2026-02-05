@@ -1,0 +1,7 @@
+.godot/editor
+.godot/exported
+.godot/imported
+.godot/mono
+.godot/shader_cache
+
+.vs

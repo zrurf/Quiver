@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://cesumfniobrty"]
+
+[ext_resource type="SpriteFrames" uid="uid://ds7yo07ne88g1" path="res://animation/gopher_sprite_frames.tres" id="1_ibkli"]
+
+[node name="Game" type="Node2D" unique_id=241311012]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=842044667]
+texture_filter = 1
+position = Vector2(106, 698.00006)
+scale = Vector2(10, 10)
+sprite_frames = ExtResource("1_ibkli")
+animation = &"walk"
+frame_progress = 0.5529123

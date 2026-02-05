@@ -1,0 +1,38 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Quiver"
+config/version="1.0.0"
+run/main_scene="uid://qfyogdowplky"
+config/features=PackedStringArray("4.6", "C#", "Mobile")
+config/icon="uid://dk7m2w68xhn8c"
+
+[compression]
+
+formats/zstd/long_distance_matching=true
+formats/zstd/compression_level=5
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/stretch/mode="canvas_items"
+
+[dotnet]
+
+project/assembly_name="QuiverAssembly"
+
+[physics]
+
+2d/run_on_separate_thread=true
+3d/run_on_separate_thread=true
+3d/physics_engine="Jolt Physics"

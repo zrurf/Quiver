@@ -1,0 +1,48 @@
+# 配置文件
+# 支持通过环境变量覆盖，格式：QUIVER_SECTION_KEY（如 QUIVER_SERVER_LISTEN）
+
+[server]
+# 服务器监听地址
+# 环境变量: QUIVER_SERVER_LISTEN
+# 命令行: --server.listen
+listen = ":80"
+
+[logger]
+# 日志级别：debug, info, warn, error, fatal
+# 环境变量: QUIVER_LOGGER_LEVEL
+# 命令行: --logger.level
+level = "debug"
+
+[database]
+# 数据库连接配置
+# 环境变量: QUIVER_DATABASE_HOST, QUIVER_DATABASE_PORT, QUIVER_DATABASE_USER, QUIVER_DATABASE_PASSWORD, QUIVER_DATABASE_NAME
+# 命令行: --database.host, --database.port, --database.user, --database.password, --database.name
+
+host = "user_db"
+port = "5432"
+user = "quiver_admin"
+password = "nimda_quiver"
+name = "quiver_user"
+
+[imdb]
+# IMDB/Redis 连接地址
+# 环境变量: QUIVER_IMDB_ADDR
+# 命令行: --imdb.addr
+addr = "imdb:6379"
+
+[mq]
+# 消息队列配置
+# 环境变量: QUIVER_MQ_ADDR, QUIVER_MQ_SUBJECT
+# 命令行: --mq.addr, --mq.subject
+addr = "nats://mq:4222"
+subject = "quiver.user.events"
+
+
+[opaque]
+# OPAQUE 协议密钥配置
+# 环境变量: QUIVER_OPAQUE_OPRF_SEED_FILE, QUIVER_OPAQUE_SERVER_PUBLIC_KEY_FILE, QUIVER_OPAQUE_SERVER_SECRET_KEY_FILE
+# 命令行: --opaque.oprf-seed-file, --opaque.server-public-key-file, --opaque.server-secret-key-file
+# 重要：请确保文件的权限设置为 600 (chmod 600)
+oprf-seed-file = "/etc/quiver/secret/oprf_seed.bin"
+server-public-key-file = "/etc/quiver/secret/server_public.bin"
+server-secret-key-file = "/etc/quiver/secret/server_secret.bin"

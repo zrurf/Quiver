@@ -1,0 +1,130 @@
+services:
+    # API负载均衡网关
+    api_gateway:
+      image: "haproxy:3.4-dev-alpine3.23"
+      container_name: ApiGateway
+      ports:
+        - "80:80"
+        - "443:443"
+      volumes:
+        - ./server/api_gateway/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+        - ./server/api_gateway/haproxy/blacklist.acl:/etc/haproxy/blacklist.acl:ro
+      networks:
+        - public
+        - internal
+      depends_on:
+        - user_server
+
+    # 游戏负载均衡网关
+    game_gateway:
+      build: ./server/game_gateway
+      container_name: GameGateway
+      ports:
+        - "8801:8801"
+        - "18550:18550/udp"
+      networks:
+        - public
+        - internal
+
+    # 消息队列
+    mq:
+      image: "nats:2.12.4-alpine3.22"
+      container_name: MQ_Nats
+      expose:
+        - "4222"
+        - "6222"
+        - "8222"
+      networks:
+        - internal
+
+    # 内存数据库
+    imdb:
+      image: "ghcr.io/microsoft/garnet-alpine:1"
+      container_name: IMDB_Garnet
+      ulimits:
+        memlock: -1
+      expose:
+        - "6379"
+      volumes:
+        - imdb:/data
+      networks:
+        - internal
+    
+    # 用户数据库
+    user_db:
+      image: "postgres:18.1-alpine3.23"
+      container_name: UserDB_Postgres
+      restart: unless-stopped
+      env_file:
+        - ./env/user_db.env
+      volumes:
+        - ./db/user/init:/docker-entrypoint-initdb.d
+        - user_db:/data
+      networks:
+        - internal
+        - public
+      ports:
+      - "7861:5432"
+
+    # 游戏数据库
+    game_db:
+      image: "postgres:18.1-alpine3.23"
+      container_name: GameDB_Postgres
+      restart: unless-stopped
+      env_file:
+        - ./env/game_db.env
+      volumes:
+        - ./db/game/init:/docker-entrypoint-initdb.d
+        - game_db:/data
+      networks:
+        - internal
+        - public
+      ports:
+        - "7862:5432"
+
+    # 用户服务器
+    user_server:
+      build: ./server/user_server
+      container_name: UserServer
+      networks:
+        - internal
+      expose:
+        - "80"
+        - "443"
+      volumes:
+        - ./config/user:/etc/quiver
+      command: ["./user_server", "--config", "/etc/quiver/config.toml"]
+      healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+
+    game_server_1:
+      build: ./server/game_server
+      container_name: GameServer_1
+      networks:
+        - internal
+      expose:
+        - "18650/udp"
+
+networks:
+  # 公共层
+  public:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+  # 内部层
+  internal:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
+
+volumes:
+  imdb:
+  user_db:
+  game_db:
