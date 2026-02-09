@@ -2,13 +2,11 @@
 package services
 
 import (
+	"encoding/hex"
 	"fmt"
 
+	"github.com/bytemare/ecc"
 	"github.com/bytemare/opaque"
-)
-
-const (
-	SessionTokenLength = 32
 )
 
 type OpaqueService struct {
@@ -32,12 +30,18 @@ func NewOpaqueService(config *OpaqueConfig) (*OpaqueService, error) {
 		return nil, fmt.Errorf("failed to create OPAQUE server: %w", err)
 	}
 
-	err = server.SetKeyMaterial(
-		nil,
-		config.ServerSecretKey,
-		config.ServerPublicKey,
-		config.OprfSeed,
-	)
+	privateKey, err := opaque.DeserializeScalar(ecc.Ristretto255Sha512, config.ServerSecretKey)
+	if err != nil {
+		return nil, fmt.Errorf("failed to deserialize server secret key: %w", err)
+	}
+
+	err = server.SetKeyMaterial(&opaque.ServerKeyMaterial{
+		PrivateKey:     privateKey,
+		PublicKeyBytes: config.ServerPublicKey,
+		OPRFGlobalSeed: config.OprfSeed,
+		Identity:       []byte("quiver"),
+	})
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to set OPAQUE key material: %w", err)
 	}
@@ -70,8 +74,7 @@ func (s *OpaqueService) GetServer() *opaque.Server {
 	return s.server
 }
 
-// GenerateSessionToken 生成 32 字节随机 token，用作 Opaque Token。
-func (s *OpaqueService) GenerateSessionToken() (string, error) {
-	b := opaque.RandomBytes(SessionTokenLength)
-	return fmt.Sprintf("%x", b), nil
+// GenerateToken 生成指定长度随机token
+func (s *OpaqueService) GenerateToken(length int) string {
+	return hex.EncodeToString(opaque.RandomBytes(length))
 }

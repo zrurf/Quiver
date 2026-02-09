@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/gofiber/fiber/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/zrurf/quiver/server/user/internal/api"
@@ -26,8 +28,14 @@ func (h *AuthHandler) RegisterInit(c fiber.Ctx) error {
 		return api.Error(c, fiber.StatusBadRequest, api.CodeInvalidBody, "invalid request body", api.StatusErrInvalidBody)
 	}
 	if req.Username == "" || len(req.RegistrationRequest) == 0 {
-		log.Info().Any("ctx", c).Msg("missing username or registrationRequest")
 		return api.Error(c, fiber.StatusBadRequest, api.CodeInvalidBody, "missing username or registrationRequest", api.StatusErrInvalidBody)
+	}
+
+	if exists, err := h.auth.UsernameExists(c.Context(), req.Username); err != nil {
+		log.Error().Any("ctx", c).Err(err).Msg("failed to check username exists")
+		return api.Error(c, fiber.StatusInternalServerError, api.CodeServerError, "failed to check username exists", api.StatusErrServer)
+	} else if exists {
+		return api.Error(c, fiber.StatusBadRequest, api.CodeRegisterInitFailed, "username already exists", api.StatusErrUsernameConflict)
 	}
 
 	respBytes, pubKey, err := h.auth.RegisterInit(c.Context(), req.Username, req.RegistrationRequest)
@@ -72,18 +80,23 @@ func (h *AuthHandler) LoginInit(c fiber.Ctx) error {
 		return api.Error(c, fiber.StatusBadRequest, api.CodeInvalidBody, "invalid request body", api.StatusErrInvalidBody)
 	}
 	if req.Username == "" || len(req.KE1) == 0 {
-		log.Info().Any("ctx", c).Msg("missing username or ke1")
 		return api.Error(c, fiber.StatusBadRequest, api.CodeInvalidBody, "missing username or ke1", api.StatusErrInvalidBody)
 	}
 
-	ke2Bytes, err := h.auth.LoginInit(c.Context(), req.Username, req.KE1)
+	if exists, err := h.auth.UsernameExists(c.Context(), req.Username); err != nil {
+		log.Error().Any("ctx", c).Err(err).Msg("failed to check username exists")
+		return api.Error(c, fiber.StatusInternalServerError, api.CodeServerError, "failed to check username exists", api.StatusErrServer)
+	} else if !exists {
+		return api.Error(c, fiber.StatusBadRequest, api.CodeLoginFailed, "login init failed", api.StatusErrLogin)
+	}
+
+	ke2Bytes, _, clientMAC, err := h.auth.LoginInit(c.Context(), req.Username, req.KE1)
 	if err != nil {
 		log.Error().Any("ctx", c).Err(err).Msg("login init failed")
 		return api.Error(c, fiber.StatusInternalServerError, api.CodeServerError, "login init failed", api.StatusErrServer)
 	}
 
-	log.Info().Str("username", req.Username).Msg("login init OK")
-	return api.Success(c, model.LoginInitResponse{KE2: ke2Bytes}, "login init OK")
+	return api.Success(c, model.LoginInitResponse{KE2: ke2Bytes, MAC: clientMAC}, "login init OK")
 }
 
 // LoginFinalize 对应 /api/auth/login-finalize
@@ -94,19 +107,44 @@ func (h *AuthHandler) LoginFinalize(c fiber.Ctx) error {
 		return api.Error(c, fiber.StatusBadRequest, api.CodeInvalidBody, "invalid request body", api.StatusErrInvalidBody)
 	}
 	if len(req.KE3) == 0 {
-		log.Info().Any("ctx", c).Msg("missing ke3")
 		return api.Error(c, fiber.StatusBadRequest, api.CodeInvalidBody, "missing ke3", api.StatusErrInvalidBody)
 	}
 
-	uid, token, err := h.auth.LoginFinalize(c.Context(), "", req.KE3)
+	uid, accessToken, refreshToken, expire, err := h.auth.LoginFinalize(c.Context(), req.Username, req.KE3, req.MAC)
 	if err != nil {
 		log.Error().Any("ctx", c).Err(err).Msg("login finalize failed")
-		return api.Error(c, fiber.StatusUnauthorized, 602, "login finalize failed", "ERR_LOGIN_FAILED")
+		return api.Error(c, fiber.StatusUnauthorized, api.CodeLoginFailed, "login finalize failed", api.StatusErrLogin)
 	}
 
 	log.Info().Str("KE3", string(req.KE3)).Int64("uid", uid).Msg("login finalize OK")
 	return api.Success(c, model.LoginFinalizeResponse{
-		UID:   uid,
-		Token: token,
+		UID:          uid,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		ExpireAt:     time.Now().UnixMilli() + (expire * 1000),
 	}, "login finalize OK")
+}
+
+// RefreshToken 刷新令牌
+func (h *AuthHandler) RefreshToken(c fiber.Ctx) error {
+	var req model.RefreshTokenRequest
+	if err := c.Bind().Body(&req); err != nil {
+		log.Error().Any("ctx", c).Err(err).Msg("bind request body failed")
+		return api.Error(c, fiber.StatusBadRequest, api.CodeInvalidBody, "invalid request body", api.StatusErrInvalidBody)
+	}
+	if len(req.RefreshToken) == 0 {
+		return api.Error(c, fiber.StatusBadRequest, api.CodeInvalidBody, "missing refresh token", api.StatusErrInvalidBody)
+	}
+	uid, accessToken, refreshToken, expire, err := h.auth.RefreshToken(c.Context(), req.RefreshToken)
+	if err != nil {
+		log.Error().Any("ctx", c).Err(err).Msg("refresh token failed")
+		return api.Error(c, fiber.StatusUnauthorized, api.CodeRefreshFailed, "refresh token failed", api.StatusErrRefresh)
+	}
+	log.Info().Str("token", string(req.RefreshToken)).Int64("uid", uid).Msg("refresh token successful")
+	return api.Success(c, model.LoginFinalizeResponse{
+		UID:          uid,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		ExpireAt:     time.Now().UnixMilli() + (expire * 1000),
+	}, "refresh token successful")
 }

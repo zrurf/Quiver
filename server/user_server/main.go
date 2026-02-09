@@ -2,14 +2,17 @@ package main
 
 import (
 	"context"
+	"crypto"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/bytedance/sonic"
+	"github.com/bytemare/ksf"
 	"github.com/bytemare/opaque"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/compress"
+	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
@@ -50,6 +53,7 @@ func main() {
 
 	// 初始化数据访问层
 	userDao := dao.NewUserRepository(dbPool)
+	sessionDao := dao.NewSessionRepository(imdb)
 
 	// 读取OPAQUE密钥
 	oprfSeed, err := os.ReadFile(config.Opaque.OPRFSeedFile)
@@ -70,7 +74,15 @@ func main() {
 
 	// 初始化微服务
 	opaqueSvc, err := services.NewOpaqueService(&services.OpaqueConfig{
-		Config:          opaque.DefaultConfiguration(),
+		Config: &opaque.Configuration{
+			OPRF:    opaque.RistrettoSha512,
+			KDF:     crypto.SHA512,
+			MAC:     crypto.SHA512,
+			Hash:    crypto.SHA512,
+			KSF:     ksf.Argon2id,
+			AKE:     opaque.RistrettoSha512,
+			Context: nil,
+		},
 		OprfSeed:        oprfSeed,
 		ServerPublicKey: pubKey,
 		ServerSecretKey: priKey,
@@ -81,19 +93,20 @@ func main() {
 	}
 
 	// 初始化fiber
-	// 使用字节的sonic
 	var app = fiber.New(fiber.Config{
 		JSONEncoder: sonic.Marshal,
 		JSONDecoder: sonic.Unmarshal,
 	})
 
-	internal.ConfigRoute(app, &internal.RouteDependencies{
-		AuthSvc: services.NewAuthService(userDao, imdb, opaqueSvc),
-	})
-
 	app.Use(compress.New(compress.Config{
 		Level: compress.LevelBestSpeed,
 	}))
+
+	app.Use(cors.New())
+
+	internal.ConfigRoute(app, &internal.RouteDependencies{
+		AuthSvc: services.NewAuthService(userDao, sessionDao, imdb, opaqueSvc),
+	})
 
 	app.Listen(config.Server.Listen)
 }

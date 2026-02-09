@@ -93,6 +93,8 @@ services:
         - "443"
       volumes:
         - ./config/user:/etc/quiver
+        - ./services/auth/dist/index.html:/etc/web/auth/index.html:ro
+        - ./services/auth/dist/assets:/etc/web/static/auth/assets
       command: ["./user_server", "--config", "/etc/quiver/config.toml"]
       healthcheck:
         test: ["CMD", "curl", "-f", "http://localhost:80/health"]

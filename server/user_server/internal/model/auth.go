@@ -30,14 +30,23 @@ type LoginInitRequest struct {
 
 type LoginInitResponse struct {
 	KE2 []byte `json:"ke2"` // 服务端 KE2
+	MAC []byte `json:"mac"` // 登录阶段 2 验证
 }
 
 // 登录阶段 2
 type LoginFinalizeRequest struct {
-	KE3 []byte `json:"ke3"` // 客户端 KE3
+	KE3      []byte `json:"ke3"`      // 客户端 KE3
+	MAC      []byte `json:"mac"`      // 登录阶段 1 的 MAC
+	Username string `json:"username"` // 用户名
 }
 
 type LoginFinalizeResponse struct {
-	UID   int64  `json:"uid"`
-	Token string `json:"token"` // Opaque Token
+	UID          int64  `json:"uid"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	ExpireAt     int64  `json:"expire_at"`
+}
+
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token"`
 }

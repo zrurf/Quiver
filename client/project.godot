@@ -16,6 +16,10 @@ run/main_scene="uid://qfyogdowplky"
 config/features=PackedStringArray("4.6", "C#", "Mobile")
 config/icon="uid://dk7m2w68xhn8c"
 
+[autoload]
+
+Global="*uid://cbpwgaoufamtx"
+
 [compression]
 
 formats/zstd/long_distance_matching=true

@@ -5,9 +5,10 @@ go 1.25.6
 require (
 	github.com/BurntSushi/toml v1.6.0
 	github.com/bytedance/sonic v1.15.0
-	github.com/bytemare/opaque v0.10.0
+	github.com/bytemare/opaque v0.10.1-0.20260127150005-1b3ce7ddfa3c
 	github.com/gofiber/fiber/v3 v3.0.0
 	github.com/jackc/pgx/v5 v5.8.0
+	github.com/opencoff/go-srp v0.6.6
 	github.com/redis/go-redis/v9 v9.17.3
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.10.2
@@ -18,15 +19,17 @@ require (
 )
 
 require (
-	filippo.io/edwards25519 v1.0.0 // indirect
-	filippo.io/nistec v0.0.2 // indirect
+	filippo.io/edwards25519 v1.1.0 // indirect
+	filippo.io/nistec v0.0.4 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
 	github.com/bytedance/sonic/loader v0.5.0 // indirect
 	github.com/bytemare/crypto v0.4.3 // indirect
-	github.com/bytemare/hash v0.1.5 // indirect
-	github.com/bytemare/hash2curve v0.1.3 // indirect
-	github.com/bytemare/ksf v0.1.0 // indirect
+	github.com/bytemare/ecc v0.9.0 // indirect
+	github.com/bytemare/hash v0.5.2 // indirect
+	github.com/bytemare/hash2curve v0.5.4 // indirect
+	github.com/bytemare/ksf v0.4.0 // indirect
+	github.com/bytemare/secp256k1 v0.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -36,7 +39,7 @@ require (
 	github.com/gofiber/schema v1.6.0 // indirect
 	github.com/gofiber/utils/v2 v2.0.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/gtank/ristretto255 v0.1.2 // indirect
+	github.com/gtank/ristretto255 v0.2.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect

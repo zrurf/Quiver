@@ -12,11 +12,12 @@
 
 ### [OPAQUE协议](opaque.md)
 
-> **注意：** 本项目OPAQUE协议已完成基础框架设计，但是存在问题，登录流程无法跑通。后续如无法解决考虑回退到基于慢hash的密码hash认证。
-
 作为aPAKE的一种实现，OPAQUE具有极高的安全性。其优点是无需向服务器透露密码本身，也能实现安全的认证。并且基于双盲设计，可以有效防止离线攻击。
 
 > **参见：**[OPAQUE协议](opaque.md)
 
 ### 令牌
 个人不太喜欢JWT的token，不仅长，并且作为Stateless的token，一经授权无法撤销。所以直接用Opaque Token来实现了。
+
+### 双令牌认证
+一般我们会使用双令牌认证，即`Access Token`和`Refresh Token`，`Access Token`用于访问API，有效期较短；`Refresh Token`仅用于刷新`Access Token`，有效期较长。这样的设计在`Access Token`泄露时，可以尽量减少攻击窗口。`Refresh Token`可以方便地吊销，并且其刷新对于用户是无感的。

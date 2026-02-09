@@ -29,11 +29,14 @@ const (
 	CodeLoggedIn           = 600
 	CodeRegisterInitFailed = 601
 	CodeLoginFailed        = 602
+	CodeRefreshFailed      = 603
 )
 
 const (
-	StatusSuccess        = "OK"
-	StatusErrInvalidBody = "ERR_INVALID_REQUEST_BODY"
-	StatusErrServer      = "ERR_SERVER_ERROR"
-	StatusErrLogin       = "ERR_LOGIN_FAILED"
+	StatusSuccess             = "OK"
+	StatusErrInvalidBody      = "ERR_INVALID_REQUEST_BODY"
+	StatusErrServer           = "ERR_SERVER_ERROR"
+	StatusErrLogin            = "ERR_LOGIN_FAILED"
+	StatusErrUsernameConflict = "ERR_USERNAME_CONFLICT"
+	StatusErrRefresh          = "ERR_REFRESH_FAILED"
 )

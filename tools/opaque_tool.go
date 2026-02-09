@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/bytemare/ecc"
 	"github.com/bytemare/ksf"
 	"github.com/bytemare/opaque"
 )
@@ -90,13 +91,13 @@ func generateKeys(conf *opaque.Configuration, format, dir string, doKeyCheck boo
 	serverSecretKey, serverPublicKey := conf.KeyGen()
 
 	fmt.Printf("✓ OPRF种子: %d 字节\n", len(oprfSeed))
-	fmt.Printf("✓ 服务器公钥: %d 字节\n", len(serverPublicKey))
-	fmt.Printf("✓ 服务器私钥: %d 字节\n", len(serverSecretKey))
+	fmt.Printf("✓ 服务器公钥: %d 字节\n", len(serverPublicKey.Encode()))
+	fmt.Printf("✓ 服务器私钥: %d 字节\n", len(serverSecretKey.Encode()))
 
 	// 3. 校验公私钥
 	if doKeyCheck {
 		fmt.Println("正在进行公私钥校验...")
-		if err := verifyKeyMaterial(conf, oprfSeed, serverPublicKey, serverSecretKey); err != nil {
+		if err := verifyKeyMaterial(conf, oprfSeed, serverPublicKey.Encode(), serverSecretKey.Encode()); err != nil {
 			fatalErr("公私钥校验失败", err)
 		}
 		fmt.Println("✓ 公私钥校验通过")
@@ -107,12 +108,12 @@ func generateKeys(conf *opaque.Configuration, format, dir string, doKeyCheck boo
 	// 4. 输出
 	switch format {
 	case "bin":
-		saveBinaryFiles(dir, oprfSeed, serverPublicKey, serverSecretKey, doKeyCheck)
+		saveBinaryFiles(dir, oprfSeed, serverPublicKey.Encode(), serverSecretKey.Encode(), doKeyCheck)
 	case "base64":
-		printBase64(oprfSeed, serverPublicKey, serverSecretKey)
+		printBase64(oprfSeed, serverPublicKey.Encode(), serverSecretKey.Encode())
 	default:
 		fmt.Printf("未知格式: %s，使用默认bin格式\n", format)
-		saveBinaryFiles(dir, oprfSeed, serverPublicKey, serverSecretKey, doKeyCheck)
+		saveBinaryFiles(dir, oprfSeed, serverPublicKey.Encode(), serverSecretKey.Encode(), doKeyCheck)
 	}
 }
 
@@ -273,8 +274,19 @@ func verifyKeyMaterial(conf *opaque.Configuration, oprfSeed, serverPubKey, serve
 		return fmt.Errorf("创建服务器实例失败: %w", err)
 	}
 
+	privateKey, err := opaque.DeserializeScalar(ecc.Ristretto255Sha512, serverSecretKey)
+
+	if err != nil {
+		return fmt.Errorf("无法从私钥字节中恢复密钥: %w", err)
+	}
+
 	// 尝试设置密钥材料，这会验证密钥对的有效性
-	if err := server.SetKeyMaterial(nil, serverSecretKey, serverPubKey, oprfSeed); err != nil {
+	if err := server.SetKeyMaterial(&opaque.ServerKeyMaterial{
+		OPRFGlobalSeed: oprfSeed,
+		PrivateKey:     privateKey,
+		PublicKeyBytes: serverPubKey,
+		Identity:       []byte("quiver"),
+	}); err != nil {
 		return fmt.Errorf("设置密钥材料失败: %w", err)
 	}
 

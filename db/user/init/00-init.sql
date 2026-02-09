@@ -23,6 +23,19 @@ CREATE TABLE IF NOT EXISTS "users" (
     "opaque_record" BYTEA NOT NULL                       -- OPAQUE注册记录
 );
 
-CREATE INDEX IF NOT EXISTS idx_users_name ON "users"("name");
+-- 登录日志表
+CREATE TABLE IF NOT EXISTS "auth_login_log" (
+    "id"        BIGSERIAL PRIMARY KEY,  -- 记录ID
+    "uid"       BIGINT REFERENCES "users"("id") ON DELETE SET NULL, -- UID
+    "username"  TEXT NOT NULL,          -- 用户名
+    "success"   BOOLEAN NOT NULL,       -- 状态
+    "reason"    TEXT COMPRESSION zstd,  -- 失败原因
+    "ip"        INET,                   -- 登录IP
+    "user_agent" TEXT COMPRESSION zstd, -- UA
+    "created_at" TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS "idx_users_name" ON "users"("name");
+CREATE INDEX IF NOT EXISTS "idx_login_log_uid" ON "auth_login_log"("uid");
 
 ALTER SEQUENCE "uid_seq" OWNED BY "users"."id";

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://h2ol6cyidpje"]
 
-[ext_resource type="Script" uid="uid://csx3sxfvkmnbr" path="res://script/scene/MainMenu.cs" id="1_0ykhv"]
+[ext_resource type="Script" uid="uid://ckhp1ybpm28p3" path="res://script/view/main_menu.gd" id="1_0ykhv"]
 [ext_resource type="FontFile" uid="uid://bhllm44026v4e" path="res://assets/font/ark-pixel-12px-monospaced-zh_cn.ttf.woff2" id="2_0ykhv"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_0ykhv"]
@@ -49,5 +49,13 @@ label_settings = SubResource("LabelSettings_0ykhv")
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=647856875]
+[node name="WebView" type="WebView" parent="." unique_id=994888790]
+url = "res://view/webview/server.html"
+transparent = true
 unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

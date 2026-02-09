@@ -165,4 +165,24 @@ namespace Quiver.Utils
                 .Replace("\t", "");
         }
     }
+
+    public static class Base64
+    {
+        public static string Encode(string text)
+        {
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
+        }
+        public static string Encode(byte[] bytes)
+        {
+            return Convert.ToBase64String(bytes);
+        }
+        public static string DecodeStr(string base64)
+        {
+            return Encoding.UTF8.GetString(Convert.FromBase64String(base64));
+        }
+        public static byte[] Decode(string base64)
+        {
+            return Convert.FromBase64String(base64);
+        }
+    }
 }

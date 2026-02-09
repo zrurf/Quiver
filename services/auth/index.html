@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>auth</title>
+  </head>
+  <body>
+    <div class="container" id="app_container">
+        <div class="header">
+            <h1 id="head-name"></h1>
+        </div>
+        <div class="form-container" id="form-body">
+            <div class="tabs">
+                <button class="tab active" data-tab="login">登录</button>
+                <button class="tab" data-tab="register">注册</button>
+            </div>
+
+            <div id="login-tab" class="tab-content active">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-username">用户名</label>
+                        <input type="text" id="login-username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">密码</label>
+                        <input type="password" id="login-password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn" id="login-btn">登录</button>
+                </form>
+                <div id="login-message" class="message"></div>
+                <div id="login-loading" class="loading" style="display: none;">登录中</div>
+            </div>
+
+            <div id="register-tab" class="tab-content">
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-username">用户名</label>
+                        <input type="text" id="register-username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">密码</label>
+                        <input type="password" id="register-password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password-confirm">确认密码</label>
+                        <input type="password" id="register-password-confirm" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn" id="register-btn">注册</button>
+                </form>
+                <div id="register-message" class="message"></div>
+                <div id="register-loading" class="loading" style="display: none;">注册中</div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
