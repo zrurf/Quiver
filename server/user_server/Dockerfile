@@ -1,5 +1,5 @@
 # 构建阶段
-FROM golang:1.25.6-alpine3.23 AS builder
+FROM golang:1.26.0-alpine3.23 AS builder
 
 # 安装编译依赖（sonic需要cgo和gcc）
 RUN apk add --no-cache \

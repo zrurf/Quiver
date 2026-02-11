@@ -1,6 +1,6 @@
 module github.com/zrurf/quiver/tools
 
-go 1.25.6
+go 1.26.0
 
 require (
 	github.com/bytemare/ksf v0.4.0
