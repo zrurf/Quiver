@@ -116,6 +116,8 @@ func initConfig() (*Config, error) {
 	initFlag()
 	var v = viper.New()
 
+	pflag.Parse()
+
 	configFile, _ := pflag.CommandLine.GetString("config")
 	v.SetConfigFile(configFile)
 

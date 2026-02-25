@@ -1,13 +1,11 @@
 [gd_scene format=3 uid="uid://cesumfniobrty"]
 
-[ext_resource type="SpriteFrames" uid="uid://ds7yo07ne88g1" path="res://animation/gopher_sprite_frames.tres" id="1_ibkli"]
+[ext_resource type="Script" uid="uid://cqjb5gnijahyh" path="res://script/scene/Game.cs" id="1_qbsmt"]
+[ext_resource type="PackedScene" uid="uid://loqak00dhgfl" path="res://actor/player.tscn" id="2_qbsmt"]
 
 [node name="Game" type="Node2D" unique_id=241311012]
+script = ExtResource("1_qbsmt")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=842044667]
-texture_filter = 1
-position = Vector2(106, 698.00006)
-scale = Vector2(10, 10)
-sprite_frames = ExtResource("1_ibkli")
-animation = &"walk"
-frame_progress = 0.5529123
+[node name="Player" parent="." unique_id=1275527992 instance=ExtResource("2_qbsmt")]
+position = Vector2(56, 34)
+scale = Vector2(5, 5)

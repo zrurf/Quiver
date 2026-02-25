@@ -7,7 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Google.FlatBuffers" Version="25.2.10" />
     <PackageReference Include="IronCompress" Version="1.7.0" />
+    <PackageReference Include="Kcp" Version="2.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
   <ItemGroup>

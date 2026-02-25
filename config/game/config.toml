@@ -1,0 +1,29 @@
+[server]
+listen-addr = ":18650"
+idle-room-timeout = "5m"
+max-players-per-room = 50
+
+[logger]
+level = "info"
+
+[database]
+host = "game_db"
+port = "5432"
+user = "quiver_admin"
+password = "nimda_quiver"
+name = "quiver_game"
+
+[imdb]
+addr = "imdb:6379"
+
+[mq]
+addr = "nats://mq:4222"
+subject = "quiver.game.events"
+
+[encryption]
+enabled = true
+master-key-base64 = "f+wpFv6PSgGcpULdDiXM+DYQR2KOXezWzcF7smQJBrI="
+
+[compression]
+enabled = true
+level = 3

@@ -1,0 +1,67 @@
+namespace game_proto;
+
+// 玩家移动
+table PlayerMove {
+    pos_x: float;
+    pos_y: float;
+    vel_x: float;
+    vel_y: float;
+    timestamp: uint64;
+}
+
+// 玩家射击
+table PlayerShoot {
+    weapon_type: uint8;
+    aim_x: float;
+    aim_y: float;
+    power: float;
+    timestamp: uint64;
+}
+
+// 玩家状态（用于服务器推送）
+table PlayerState {
+    uid: uint64;
+    pos_x: float;
+    pos_y: float;
+    health: uint32;
+    buffs: [uint8];
+}
+
+// 抛射物状态
+table ProjectileState {
+    id: uint64;
+    owner_uid: uint64;
+    pos_x: float;
+    pos_y: float;
+    vel_x: float;
+    vel_y: float;
+    proj_type: uint8;
+}
+
+// 游戏事件（随机事件等）
+table GameEvent {
+    event_type: uint8;
+    data: [ubyte];
+}
+
+// 游戏状态更新（服务器推送给客户端）
+table GameStateUpdate {
+    players: [PlayerState];
+    projectiles: [ProjectileState];
+    events: [GameEvent];
+    timestamp: uint64;
+}
+
+// 游戏消息联合
+union GameMessage {
+    PlayerMove,
+    PlayerShoot,
+    GameStateUpdate,
+}
+
+// 完整游戏数据包（无头部）
+table GamePacket {
+    body: GameMessage;
+}
+
+root_type GamePacket;

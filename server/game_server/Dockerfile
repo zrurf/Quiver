@@ -1,16 +1,17 @@
 # 构建阶段
 FROM golang:1.26.0-alpine3.23 AS builder
 
-# 安装编译依赖
+# 安装编译依赖（sonic需要cgo和gcc）
 RUN apk add --no-cache \
     gcc \
     musl-dev \
     git \
     make
 
+# 设置工作目录
 WORKDIR /app
 
-# 设置环境变量
+# 启用cgo（sonic需要）
 ENV CGO_ENABLED=1 \
     GOOS=linux \
     GOARCH=amd64 \
@@ -23,35 +24,32 @@ RUN go mod download
 # 复制源代码
 COPY . .
 
-# 编译
-RUN go build -tags=sonic \
-    -ldflags="-s -w" \
-    -o game_server .
+# 编译（使用sonic标签）
+RUN go build -tags=sonic -ldflags="-s -w" -o game_server .
 
 # 运行时阶段
 FROM alpine:3.23
 
-# 安装运行时依赖
+# 安装必要的运行时库
 RUN apk add --no-cache \
     ca-certificates \
     tzdata \
-    curl \
-    postgresql-client
+    libc6-compat
 
 # 设置时区
-ENV TZ=Asia/Shanghai \
-    GIN_MODE=release
-
-WORKDIR /app
-
-# 复制二进制文件
-COPY --from=builder /app/game_server .
+ENV TZ=Asia/Shanghai
 
 # 创建非root用户
 RUN addgroup -g 1000 app && \
-    adduser -u 1000 -G app -D app && \
-    chown -R app:app /app
+    adduser -u 1000 -G app -D app
 
+# 设置工作目录
+WORKDIR /app
+
+# 从构建阶段复制二进制文件
+COPY --from=builder --chown=app:app /app/game_server .
+
+# 切换到非root用户
 USER app
 
 # 启动命令

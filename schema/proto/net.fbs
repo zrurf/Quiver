@@ -1,0 +1,70 @@
+namespace net_proto;
+
+// 固定头部
+struct PacketHeader {
+    magic: uint32;      // 魔数，用于快速校验
+    version: uint16;    // 协议版本
+    flags: uint16;      // 标志位（如加密、压缩）
+    session_id: uint64; // 网关分配的会话ID（对应客户端连接）
+    room_id: uint64;    // 房间ID（0表示未加入房间）
+    msg_type: uint16;   // 消息类型（与 union 对应）
+    reserved: uint16;   // 保留
+    timestamp: uint64;  // 客户端时间戳（用于防重放）
+}
+
+// 认证请求（OPAQUE token）
+table AuthRequest {
+    token: string;                         // token
+}
+
+table AuthResponse {
+    success: bool;
+    session_id: uint64;
+    error_message: string;
+}
+
+// 加入房间请求
+enum GameMode : uint8 {
+    QuickMatch = 0,
+    SpecificRoom = 1,
+}
+
+table JoinRoom {
+    mode: GameMode;
+    target_room_id: uint64; // 指定房间时有效
+}
+
+table JoinRoomResponse {
+    success: bool;
+    room_id: uint64;
+    game_server_addr: string; // 网关实际不需要暴露，但可用于调试
+    error_code: int32;
+}
+
+// 游戏数据透传（具体结构由游戏服务器定义）
+table GameData {
+    data: [ubyte]; // 透传二进制数据
+}
+
+// 心跳
+table Heartbeat {
+    ping: uint64;
+}
+
+// 消息体联合
+union AnyMessage {
+    AuthRequest,
+    AuthResponse,
+    JoinRoom,
+    JoinRoomResponse,
+    GameData,
+    Heartbeat,
+}
+
+// 完整消息包装
+table Message {
+    header: PacketHeader;
+    body: AnyMessage;
+}
+
+root_type Message;

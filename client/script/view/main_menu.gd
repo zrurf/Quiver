@@ -2,6 +2,7 @@ extends Control
 
 @onready var version_label: Label = $%VersionLabel
 @onready var webview: WebView = $%WebView
+@onready var start_btn: Button = $%StartBtn
 
 func _ready() -> void:
 	var app_version = ProjectSettings.get_setting("application/config/version")
@@ -13,6 +14,8 @@ func _ready() -> void:
 	
 	# Webview配置
 	webview.connect("ipc_message", _on_webview_ipc_msg, FLAG_PROCESS_THREAD_MESSAGES_ALL)
+	
+	start_btn.button_pressed = _on_start_btn_pressed()
 	
 func _on_webview_ipc_msg(message) -> void:
 	var data = JSON.parse_string(message)
@@ -26,9 +29,13 @@ func _on_webview_ipc_msg(message) -> void:
 				Global.expire_at = data.payload.expire_at
 				await get_tree().create_timer(2).timeout
 				NodeUitl.disable_node(webview)
+				start_btn.disabled = false
 		"set_server":
 			if data.payload.addr && data.payload.login_url:
 				Global.server = data.payload.addr
 				webview.load_url("{0}?app=Gopher%26Quiver&server={1}".format([data.payload.login_url,data.payload.addr]))
 		_:
 			print("Unknown WebView Action")
+			
+func _on_start_btn_pressed():
+	get_tree().change_scene_to_file("res://scene/Game.tscn")

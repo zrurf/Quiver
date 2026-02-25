@@ -20,11 +20,13 @@ services:
       build: ./server/game_gateway
       container_name: GameGateway
       ports:
-        - "8801:8801"
         - "18550:18550/udp"
       networks:
         - public
         - internal
+      volumes:
+        - ./config/game_gateway:/etc/quiver
+      command: ["./game_gateway", "--config", "/etc/quiver/config.toml"]
 
     # 消息队列
     mq:
@@ -109,6 +111,20 @@ services:
         - internal
       expose:
         - "18650/udp"
+      volumes:
+        - ./config/game:/etc/quiver:ro
+      command: ["./game_server", "--config", "/etc/quiver/config.toml"]
+
+    game_server_2:
+      build: ./server/game_server
+      container_name: GameServer_2
+      networks:
+        - internal
+      expose:
+        - "18650/udp"
+      volumes:
+        - ./config/game:/etc/quiver:ro
+      command: ["./game_server", "--config", "/etc/quiver/config.toml"]
 
 networks:
   # 公共层

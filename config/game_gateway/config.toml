@@ -1,0 +1,50 @@
+# 配置文件
+# 支持通过环境变量覆盖，格式：QUIVER_SECTION_KEY（如 QUIVER_SERVER_LISTEN）
+
+game-servers = [
+    "game_server_1:18650",
+    "game_server_2:18650"
+]
+
+[server]
+# 服务器监听地址
+# 环境变量: QUIVER_SERVER_LISTEN
+# 命令行: --server.listen
+listen = ":80"
+kcp-port = 18550
+internal-listen = 8080
+idle-room-timeout = "5m"
+rate-limit = 100
+
+[logger]
+# 日志级别：debug, info, warn, error, fatal
+# 环境变量: QUIVER_LOGGER_LEVEL
+# 命令行: --logger.level
+level = "debug"
+
+[database]
+# 数据库连接配置
+# 环境变量: QUIVER_DATABASE_HOST, QUIVER_DATABASE_PORT, QUIVER_DATABASE_USER, QUIVER_DATABASE_PASSWORD, QUIVER_DATABASE_NAME
+# 命令行: --database.host, --database.port, --database.user, --database.password, --database.name
+
+host = "game_db"
+port = "5432"
+user = "quiver_admin"
+password = "nimda_quiver"
+name = "quiver_game"
+
+[imdb]
+# IMDB/Redis 连接地址
+# 环境变量: QUIVER_IMDB_ADDR
+# 命令行: --imdb.addr
+addr = "imdb:6379"
+
+[mq]
+# 消息队列配置
+# 环境变量: QUIVER_MQ_ADDR, QUIVER_MQ_SUBJECT
+# 命令行: --mq.addr, --mq.subject
+addr = "nats://mq:4222"
+subject = "quiver.gateway.events"
+
+[play]
+max-players-per-room = "50"

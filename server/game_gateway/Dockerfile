@@ -1,20 +1,20 @@
 # 构建阶段
 FROM golang:1.26.0-alpine3.23 AS builder
 
-# 安装编译依赖
+# 安装编译依赖（sonic需要cgo和gcc）
 RUN apk add --no-cache \
     gcc \
     musl-dev \
     git \
     make
 
+# 设置工作目录
 WORKDIR /app
 
-# 启用cgo并设置优化标志
+# 启用cgo（sonic需要）
 ENV CGO_ENABLED=1 \
     GOOS=linux \
     GOARCH=amd64 \
-    GOGC=off \
     GOPROXY=https://goproxy.cn,direct
 
 # 复制go模块文件
@@ -24,37 +24,33 @@ RUN go mod download
 # 复制源代码
 COPY . .
 
-# 编译（UDP服务需要网络优化）
-RUN go build -tags=sonic,netgo \
-    -ldflags="-s -w -linkmode=external -extldflags=-static" \
-    -o game_gateway .
+# 编译（使用sonic标签）
+RUN go build -tags=sonic -ldflags="-s -w" -o game_gateway .
 
 # 运行时阶段
 FROM alpine:3.23
 
-# 安装最小运行时依赖
+# 安装必要的运行时库
 RUN apk add --no-cache \
     ca-certificates \
-    tzdata
+    tzdata \
+    libc6-compat
 
 # 设置时区
 ENV TZ=Asia/Shanghai
 
-# 设置网络参数（优化UDP性能）
-RUN echo "net.core.rmem_max=26214400" >> /etc/sysctl.conf && \
-    echo "net.core.wmem_max=26214400" >> /etc/sysctl.conf && \
-    echo "net.ipv4.udp_mem=4096 87380 16777216" >> /etc/sysctl.conf
+# 创建非root用户
+RUN addgroup -g 1000 app && \
+    adduser -u 1000 -G app -D app
 
+# 设置工作目录
 WORKDIR /app
 
-# 复制二进制文件
-COPY --from=builder /app/game_gateway .
+# 从构建阶段复制二进制文件
+COPY --from=builder --chown=app:app /app/game_gateway .
 
-# 创建运行用户
-RUN adduser -D -u 1000 appuser && \
-    chown -R appuser:appuser /app
-
-USER appuser
+# 切换到非root用户
+USER app
 
 # 启动命令
 CMD ["./game_gateway"]

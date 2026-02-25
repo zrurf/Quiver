@@ -1,0 +1,97 @@
+[gd_scene format=3 uid="uid://loqak00dhgfl"]
+
+[ext_resource type="Script" uid="uid://bgc0f84qxnxh" path="res://script/game/player/Player.cs" id="1_pcoxj"]
+[ext_resource type="Texture2D" uid="uid://60fphouhtt6i" path="res://assets/sprite/gopher.png" id="2_pcoxj"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ibkli"]
+
+[sub_resource type="Animation" id="Animation_pcoxj"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [3]
+}
+
+[sub_resource type="Animation" id="Animation_mlbvo"]
+resource_name = "idle"
+length = 3.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4, 0.8, 1.2, 1.6, 2, 2.4, 2.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [3, 4, 5, 3, 7, 3, 7, 3]
+}
+
+[sub_resource type="Animation" id="Animation_k4v8y"]
+resource_name = "run"
+length = 0.7
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [16, 17, 18, 19, 20, 21, 22, 23]
+}
+
+[sub_resource type="Animation" id="Animation_0bt4a"]
+resource_name = "walk"
+length = 1.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [8, 9, 10, 11, 12, 13, 14, 15]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_k4v8y"]
+_data = {
+&"RESET": SubResource("Animation_pcoxj"),
+&"idle_anime": SubResource("Animation_mlbvo"),
+&"run": SubResource("Animation_k4v8y"),
+&"walk": SubResource("Animation_0bt4a")
+}
+
+[node name="Player" type="CharacterBody2D" unique_id=1275527992]
+script = ExtResource("1_pcoxj")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=557326327]
+shape = SubResource("CircleShape2D_ibkli")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1752807999]
+unique_name_in_owner = true
+texture_filter = 1
+texture_repeat = 1
+texture = ExtResource("2_pcoxj")
+hframes = 27
+frame = 3
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1852889648]
+unique_name_in_owner = true
+libraries/ = SubResource("AnimationLibrary_k4v8y")
